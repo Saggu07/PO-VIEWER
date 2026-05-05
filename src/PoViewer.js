@@ -464,9 +464,12 @@
 
 
 import { useEffect, useState } from "react";
+import { useParams } from "react-router-dom";
 
 // Format date 
 const formatDate = (dateString) => {
+  if (!dateString) return "-";
+
   const date = new Date(dateString);
   const day = date.getDate();
   const month = date.toLocaleString('default', { month: 'long' });
@@ -483,6 +486,170 @@ const formatDate = (dateString) => {
   };
   
   return `${day}${getOrdinalSuffix(day)} ${month} ${year}`;
+};
+
+// ================= MOCK DATA (MULTIPLE PO) =================
+
+const poDataMap = {
+  1: {
+    pdfUrl: "https://drive.google.com/file/d/12821iKUZyIZN_zyFF94hwnUUBQSdcx38/preview",
+
+    buyer_po_number: "FN26052",
+    order_date: "2026-05-04",
+    currency: "USD",
+    value_of_goods: 11172,
+
+    buyer_company: "FUNOMAD CO., LTD",
+    buyer_contact: "KENNY LEE",
+    buyer_email: "kennylee@funomad.com",
+
+    vendor_company: "TER DEK, LLC",
+    vendor_address: "8 M SON, IRVINE, CA 92618 US",
+
+    items: [
+      {
+        vendor_sku: "10-2856",
+        description: "Prism 856 Encoder",
+        qty: 2,
+        unit_price: 2793,
+        discount_percent: 0,
+        line_total: 5586
+      },
+      {
+        vendor_sku: "10-2858",
+        description: "Prism 858 Decoder",
+        qty: 2,
+        unit_price: 2793,
+        discount_percent: 0,
+        line_total: 5586
+      }
+    ]
+  },
+
+  2: {
+    pdfUrl: "https://drive.google.com/file/d/1Ru5gfNxC8C0FEb-TWbGf1Ef9z4FQoKbc/preview",
+
+    buyer_po_number: "CF2605-20905",
+    order_date: "2026-05-01",
+    currency: "USD",
+    value_of_goods: 39.2,
+
+    buyer_company: "Visuals Switzerland SA",
+    buyer_contact: "+41 22 561 07 07",
+    buyer_email: "procurement@visuals.ch",
+
+    vendor_company: "Teradek LLC",
+    vendor_address: "8 Mason Irvine, 92618 United States",
+
+    items: [
+      {
+        vendor_sku: "01-0036",
+        description: "Core 3.0 Basic Subscription (Monthly)",
+        qty: 1,
+        unit_price: 39.2,
+        discount_percent: 0,
+        line_total: 39.2
+      }
+    ]
+  },
+  3: {
+  pdfUrl: "https://drive.google.com/file/d/1_1Gml6r-qyp_dn4e4wF08TBhZNB4lnHI/preview",
+
+  buyer_po_number: "SS260501630J",
+  order_date: "2026-05-01",
+  currency: "USD",
+  value_of_goods: 9319.88,
+
+  buyer_company: "B&H PHOTO - VIDEO, INC.",
+  buyer_contact: "Sol Salamon (#2665)",
+  buyer_email: "yechiels@bhphoto.com",
+
+  vendor_company: "SMALLHD, LLC",
+  vendor_address: "301 GREGSON DR, CARY, NC 27511",
+
+  items: [
+    {
+      vendor_sku: "SMLHDMCRFF36",
+      description: "3' MICRO to FULL HDMI CABLE",
+      qty: 30,
+      unit_price: 17.49,
+      discount_percent: 0,
+      line_total: 524.7
+    },
+    {
+      vendor_sku: "SMPWRPB4K2VM",
+      description: "DUAL V-MOUNT BATTERY BRACKET",
+      qty: 20,
+      unit_price: 279.3,
+      discount_percent: 0,
+      line_total: 5586
+    },
+    {
+      vendor_sku: "SMCSTANDSCRP",
+      description: "C-STAND SCREW PACK",
+      qty: 5,
+      unit_price: 13.99,
+      discount_percent: 0,
+      line_total: 69.95
+    },
+    {
+      vendor_sku: "SMCCK2000",
+      description: "CAMERA CONTROL KIT",
+      qty: 2,
+      unit_price: 350,
+      discount_percent: 0,
+      line_total: 700
+    },
+    {
+      vendor_sku: "SMSP500ACR",
+      description: "ACRYLIC SCREEN PROTECTOR",
+      qty: 1,
+      unit_price: 3.5,
+      discount_percent: 0,
+      line_total: 3.5
+    },
+    {
+      vendor_sku: "SMASP703UNU",
+      description: "ANTI REFLECTIVE SCREEN PROTECTOR",
+      qty: 4,
+      unit_price: 27.99,
+      discount_percent: 0,
+      line_total: 111.96
+    },
+    {
+      vendor_sku: "SM174308",
+      description: "MICRO-USB TO 5PIN ADAPTER",
+      qty: 2,
+      unit_price: 62.99,
+      discount_percent: 0,
+      line_total: 125.98
+    },
+    {
+      vendor_sku: "SM179008",
+      description: "DIAL GUARD FOR ULTRA 10",
+      qty: 1,
+      unit_price: 27.99,
+      discount_percent: 0,
+      line_total: 27.99
+    },
+    {
+      vendor_sku: "SM173001",
+      description: "D-TAP TO 2-PIN POWER CABLE",
+      qty: 20,
+      unit_price: 101.5,
+      discount_percent: 0,
+      line_total: 2030
+    },
+    {
+      vendor_sku: "SMSGLANTENNA",
+      description: "REPLACEMENT ANTENNA",
+      qty: 20,
+      unit_price: 6.99,
+      discount_percent: 0,
+      line_total: 139.8
+    }
+  ]
+}
 };
 
 // ================= COMPONENTS =================
@@ -531,7 +698,7 @@ const POHeader = ({ data }) => (
       <div style={styles.infoItem}>
         <span style={styles.label}>Total Value:</span>
         <span style={styles.valueHighlight}>
-          {data.currency} {parseFloat(data.value_of_goods).toLocaleString()}
+          {data.currency} {parseFloat(data.value_of_goods || 0).toLocaleString()}
         </span>
       </div>
     </div>
@@ -623,54 +790,23 @@ const MainLayout = ({ data }) => (
 // ================= MAIN =================
 
 export default function PoViewer() {
+  const { id } = useParams();
   const [data, setData] = useState(null);
 
   useEffect(() => {
-    const mockData = {
-      pdfUrl: "https://drive.google.com/file/d/12821iKUZyIZN_zyFF94hwnUUBQSdcx38/preview",
+    setData(null); // reset for loading
 
-      buyer_po_number: "FN26052",
-      order_date: "2026-05-04",
-      currency: "USD",
-      value_of_goods: 11172,
-
-      buyer_company: "FUNOMAD CO., LTD",
-      buyer_contact: "KENNY LEE",
-      buyer_email: "kennylee@funomad.com",
-
-      vendor_company: "TER DEK, LLC",
-      vendor_address: "8 M SON, IRVINE, CA 92618 US",
-
-      items: [
-        {
-          vendor_sku: "10-2856",
-          description: "Prism 856 Prism Flex Mk II HEVC/VC 12G-SDI/HDMI Encoder",
-          qty: 2,
-          unit_price: 2793,
-          discount_percent: 0,
-          line_total: 5586
-        },
-        {
-          vendor_sku: "10-2858",
-          description: "Prism 858 Prism Flex Mk II HEVC/VC 12G-SDI/HDMI Decoder",
-          qty: 2,
-          unit_price: 2793,
-          discount_percent: 0,
-          line_total: 5586
-        }
-      ]
-    };
+    const selectedData = poDataMap[id];
 
     setTimeout(() => {
-      setData(mockData);
+      setData(selectedData || null);
     }, 500);
-  }, []);
+  }, [id]);
 
   if (!data) return <LoadingSpinner />;
 
   return <MainLayout data={data} />;
 }
-
 // // ============== STYLES ==============
 
 const styles = {
